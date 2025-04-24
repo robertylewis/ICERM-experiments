@@ -9,7 +9,6 @@ elab "#ask_claude " s:str : command => do
   let msg : String :=
   "{\"model\": \"claude-3-haiku-20240307\", \"max_tokens\": 256, \"messages\": [{\"role\": \"user\", \"content\": \"" ++ prompt ++ "\"}]}"
   let payload := msg
-  logInfo payload
 
   let output ← IO.Process.output {
     cmd := "curl",
