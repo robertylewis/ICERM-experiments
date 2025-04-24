@@ -5,8 +5,7 @@ open Lean Elab Command IO Syntax
 elab "#ask_claude " s:str : command => do
   let prompt := s.getString
   let msg : String :=
-  "{\"model\": \"claude-3-haiku-20240307\", \"max_tokens\": 256, \"messages\": [{{\"role\": \"user\", \"content\": \"" ++ prompt ++ "\"}}]}"
-  logInfo msg
+  "{\"model\": \"claude-3-haiku-20240307\", \"max_tokens\": 256, \"messages\": [{\"role\": \"user\", \"content\": \"" ++ prompt ++ "\"}]}"
   let payload := msg
 
   let output ← IO.Process.output {
@@ -26,7 +25,6 @@ elab "#ask_claude " s:str : command => do
   if output.exitCode == 0 then
     -- Rough way to extract Claude's response (not robust JSON parsing)
     let response := output.stdout
-    logInfo m!"response: {response}"
     let content :=
       match response.splitOn "\"text\":\"" with
       | _ :: after =>
