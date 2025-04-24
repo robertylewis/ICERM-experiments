@@ -34,15 +34,16 @@ elab "#ask_claude " s:str : command => do
         | some text => text.replace "\\n" "\n"
         | none => "Could not extract Claude's reply"
       | _ => "No Claude output found"
-    let content := content.drop 8 |>.take (content.length - 8 - 4)
-    logInfo m!"Claude says:\n{content}"
+    if content.startsWith "```lean\n" && content.endsWith "```" then
+      let content := content.drop 8 |>.take (content.length - 8 - 4)
+    -- logInfo m!"Claude says:\n{content}"
 
-    liftTermElabM <|
-      Meta.Tactic.TryThis.addSuggestion (←getRef) { suggestion := s!"#check {content}" }
-
+      liftTermElabM <|
+        Meta.Tactic.TryThis.addSuggestion (←getRef) { suggestion := s!"#check {content}" }
+    else throwError "Claude gave us a response that was not just Lean code"
 
   else
     throwError "Claude command failed with exit code {output.exitCode}"
 
 
-#ask_claude "every natural number is either even or odd"
+-- #check ∃ {n : ℕ} {f : fin n → α}, (∃ i j, i ≠ j ∧ f i = f j)
