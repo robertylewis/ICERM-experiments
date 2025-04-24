@@ -8,7 +8,7 @@ elab "#formalize " s:str : command => do
 
   let output ← IO.Process.output {
     cmd := "ollama",
-    args := #["run", "mistral", s!"Translate this informal statement to Lean code, please, with no extra text: {input}"],
+    args := #["run", "mistral", s!"Translate this informal statement to Lean code based on mathlib. The response must begin with ```lean and end with ```: {input}"],
     stdin := .null,
     stdout := .piped,
     stderr := .inherit
