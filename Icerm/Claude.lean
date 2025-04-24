@@ -1,9 +1,11 @@
 import Lean
 import Icerm.API
+import Mathlib.Tactic
 open Lean Elab Command IO Syntax
 
 elab "#ask_claude " s:str : command => do
-  let prompt := s.getString
+  let input := s.getString
+  let prompt := s!"Translate this informal statement to a Lean proposition based on mathlib. The response must begin with ```lean and end with ``` and should just be a type, without proof and without `theorem`: {input}"
   let msg : String :=
   "{\"model\": \"claude-3-haiku-20240307\", \"max_tokens\": 256, \"messages\": [{\"role\": \"user\", \"content\": \"" ++ prompt ++ "\"}]}"
   let payload := msg
@@ -32,8 +34,7 @@ elab "#ask_claude " s:str : command => do
         | some text => text.replace "\\n" "\n"
         | none => "Could not extract Claude's reply"
       | _ => "No Claude output found"
+    let content := content.drop 8 |>.take (content.length - 8 - 4)
     logInfo m!"Claude says:\n{content}"
-  else
-    throwError "Claude command failed with exit code {output.exitCode}"
 
-#ask_claude "are you there?"
+#ask_claude "every natural number is either even or odd"
