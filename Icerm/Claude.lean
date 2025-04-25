@@ -7,7 +7,7 @@ elab "#set_anthropic_api_key" s:str : command => do
   anthropicAPIKeyRef.set s.getString
 
 def anthropicApiKey : IO String := do 
-  match (← IO.getEnv "ANTHROPIC_API_KEY"), ← anthropicAPIKeyRef.get with 
+  match ← anthropicAPIKeyRef.get, (← IO.getEnv "ANTHROPIC_API_KEY") with 
   | some key, _ => return key
   | none, some key => return key
   | none, none => throw <| .userError "Environment variable ANTHROPIC_API_KEY not found"
