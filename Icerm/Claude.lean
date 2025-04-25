@@ -1,11 +1,16 @@
+import Icerm.Init
 import Lean
 import Mathlib.Tactic
 open Lean Elab Command IO Syntax
 
+elab "#set_anthropic_api_key" s:str : command => do
+  anthropicAPIKeyRef.set s.getString
+
 def anthropicApiKey : IO String := do 
-  match ← IO.getEnv "ANTHROPIC_API_KEY" with 
-  | some key => return key
-  | none => throw <| .userError "Environment variable ANTHROPIC_API_KEY not found"
+  match (← IO.getEnv "ANTHROPIC_API_KEY"), ← anthropicAPIKeyRef.get with 
+  | some key, _ => return key
+  | none, some key => return key
+  | none, none => throw <| .userError "Environment variable ANTHROPIC_API_KEY not found"
 
 elab "#ask_claude " s:str : command => do
   let input := s.getString
